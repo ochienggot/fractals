@@ -79,7 +79,7 @@ public class FractalExplorer {
         imageDisplay.repaint();
     }
 
-    public class ActionHandler implements ActionListener {
+    private class ActionHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
             fractalGenerator.getInitialRange(range);
@@ -87,7 +87,7 @@ public class FractalExplorer {
         }
     }
 
-    public class ActionHandlerMouseEvents extends MouseAdapter {
+    private class ActionHandlerMouseEvents extends MouseAdapter {
 
         @Override
         public void mouseClicked(MouseEvent e) {
