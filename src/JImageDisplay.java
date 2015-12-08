@@ -17,6 +17,10 @@ public class JImageDisplay extends JComponent {
         super.setPreferredSize(new Dimension(width, height));
     }
 
+    public BufferedImage getImage() {
+        return bufImage;
+    }
+
     /**
      * override method in superclass. Calls the superclass method and then
      * draws the image

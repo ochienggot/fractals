@@ -7,6 +7,11 @@ import java.awt.event.*;
 import java.awt.event.ActionListener;
 import java.awt.geom.*;
 import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 
 public class FractalExplorer {
@@ -19,6 +24,10 @@ public class FractalExplorer {
     private FractalGenerator fractalGenerator;
 
     private Rectangle2D.Double range;
+
+    private JComboBox fractalChooser;
+
+    JFrame frame;
 
     public FractalExplorer(int displaySize) {
 
@@ -33,7 +42,7 @@ public class FractalExplorer {
      */
     void createAndShowGUI() {
 
-        JFrame frame = new JFrame("Fractal Explorer");
+        frame = new JFrame("Fractal Explorer");
         frame.setLayout(new BorderLayout());
 
         imageDisplay = new JImageDisplay(displaySize, displaySize);
@@ -41,8 +50,31 @@ public class FractalExplorer {
         frame.add(imageDisplay, BorderLayout.CENTER);
 
         JButton button = new JButton("Reset Display");
-        button.addActionListener(new ActionHandler());
-        frame.add(button, BorderLayout.SOUTH);
+        ActionHandler actionHandler = new ActionHandler();
+        button.setActionCommand("reset");
+        button.addActionListener(actionHandler);
+        //frame.add(button, BorderLayout.SOUTH);
+
+        JButton saveButton = new JButton("Save Image");
+        saveButton.setActionCommand("save");
+        saveButton.addActionListener(actionHandler);
+
+        // Save Image button -> panel?
+        JPanel southPanel = new JPanel();
+        southPanel.add(button);
+        southPanel.add(saveButton);
+        frame.add(southPanel, BorderLayout.SOUTH);
+
+        fractalChooser = new JComboBox();
+        fractalChooser.addItem(new Mandelbrot());
+        fractalChooser.addItem(new Tricorn());
+        fractalChooser.addItem(new BurningShip());
+        fractalChooser.addActionListener(actionHandler);
+
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Fractal:"));
+        panel.add(fractalChooser);
+        frame.add(panel, BorderLayout.NORTH);
 
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -82,8 +114,37 @@ public class FractalExplorer {
     private class ActionHandler implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            fractalGenerator.getInitialRange(range);
-            drawFractal();
+            String cmd = e.getActionCommand();
+
+            if (e.getSource() == fractalChooser) {
+                // Get fractal user selected and display it
+                fractalGenerator = (FractalGenerator)fractalChooser.getSelectedItem();
+                fractalGenerator.getInitialRange(range);
+                drawFractal();
+
+            }
+            else if (cmd.equals("reset")) {
+                fractalGenerator.getInitialRange(range);
+                drawFractal();
+            }
+            else if (cmd.equals("save")){
+
+                JFileChooser fileChooser = new JFileChooser();
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");
+                fileChooser.setFileFilter(filter);
+                fileChooser.setAcceptAllFileFilterUsed(false);
+
+                int ret = fileChooser.showDialog(frame, "Save file");
+                try {
+                    if (ret == JFileChooser.APPROVE_OPTION) {
+                        File file = fileChooser.getSelectedFile();
+                        ImageIO.write(imageDisplay.getImage(), "png", file);
+
+                    }
+                } catch (IOException io) {
+                    JOptionPane.showMessageDialog(frame, io.getMessage(), "Cannot save image", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
     }
 
