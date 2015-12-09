@@ -16,24 +16,23 @@ import javax.imageio.ImageIO;
 
 public class FractalExplorer {
 
-    // display size height = width of the display in pixels (square display)
     private int displaySize;
 
     private JImageDisplay imageDisplay;
 
-    private FractalGenerator fractalGenerator;
+    private FractalGenerator fractal;
 
     private Rectangle2D.Double range;
 
     private JComboBox fractalChooser;
 
-    JFrame frame;
+    private JFrame frame;
 
     public FractalExplorer(int displaySize) {
 
         this.displaySize = displaySize;
         range = new Rectangle2D.Double();
-        fractalGenerator = new Mandelbrot();
+        fractal = new Mandelbrot();
     }
 
     /**
@@ -53,13 +52,11 @@ public class FractalExplorer {
         ActionHandler actionHandler = new ActionHandler();
         button.setActionCommand("reset");
         button.addActionListener(actionHandler);
-        //frame.add(button, BorderLayout.SOUTH);
 
         JButton saveButton = new JButton("Save Image");
         saveButton.setActionCommand("save");
         saveButton.addActionListener(actionHandler);
 
-        // Save Image button -> panel?
         JPanel southPanel = new JPanel();
         southPanel.add(button);
         southPanel.add(saveButton);
@@ -88,15 +85,14 @@ public class FractalExplorer {
      * Loops through every pixel in the display (x: 0 to displaySize, y: 0 to displaySize)
      */
     private void drawFractal() {
-        //fractalGenerator.getInitialRange(range);
 
         for (int x = 0; x < displaySize; x++) {
             for (int y = 0; y < displaySize; y++) {
 
-                double xCoord = fractalGenerator.getCoord(range.x, range.x + range.width, displaySize, x);
-                double yCoord = fractalGenerator.getCoord(range.y, range.y + range.height, displaySize, y);
+                double xCoord = fractal.getCoord(range.x, range.x + range.width, displaySize, x);
+                double yCoord = fractal.getCoord(range.y, range.y + range.height, displaySize, y);
 
-                int iterations = fractalGenerator.numIterations(xCoord, yCoord);
+                int iterations = fractal.numIterations(xCoord, yCoord);
                 if (iterations == -1) {
                     imageDisplay.drawPixel(x, y, 0);
                 } else {
@@ -117,14 +113,14 @@ public class FractalExplorer {
             String cmd = e.getActionCommand();
 
             if (e.getSource() == fractalChooser) {
-                // Get fractal user selected and display it
-                fractalGenerator = (FractalGenerator)fractalChooser.getSelectedItem();
-                fractalGenerator.getInitialRange(range);
+
+                fractal = (FractalGenerator)fractalChooser.getSelectedItem();
+                fractal.getInitialRange(range);
                 drawFractal();
 
             }
             else if (cmd.equals("reset")) {
-                fractalGenerator.getInitialRange(range);
+                fractal.getInitialRange(range);
                 drawFractal();
             }
             else if (cmd.equals("save")){
@@ -154,9 +150,9 @@ public class FractalExplorer {
         public void mouseClicked(MouseEvent e) {
             Point point = e.getLocationOnScreen();
             // map the click pixel coordinates into the area of the fractal being displayed
-            double xCoord = fractalGenerator.getCoord(range.x, range.x + range.width, displaySize, (int)point.getX());
-            double yCoord = fractalGenerator.getCoord(range.y, range.y + range.width, displaySize, (int)point.getY());
-            fractalGenerator.recenterAndZoomRange(range, xCoord, yCoord, 0.5);
+            double xCoord = fractal.getCoord(range.x, range.x + range.width, displaySize, (int)point.getX());
+            double yCoord = fractal.getCoord(range.y, range.y + range.width, displaySize, (int)point.getY());
+            fractal.recenterAndZoomRange(range, xCoord, yCoord, 0.5);
 
             drawFractal();
         }
