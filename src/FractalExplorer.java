@@ -158,6 +158,34 @@ public class FractalExplorer {
         }
     }
 
+    private class FractalWorker extends SwingWorker<Object, Object> {
+
+        private int yCoord;
+        private int[][] rgbValues;
+
+        public FractalWorker(int yCoord) {
+            this.yCoord = yCoord;
+        }
+
+        /*
+            Called on a background thread to do long running tasks and free up event dispatch thread
+         */
+        @Override
+        protected Object doInBackground() {
+            rgbValues = new int[displaySize][displaySize];
+            // TODO
+
+
+            return null;
+        }
+
+        @Override
+        public void done() {
+            // TODO
+
+        }
+    }
+
     public static void main(String[] args) {
 
         FractalExplorer fractalExplorer = new FractalExplorer(800);
